@@ -294,6 +294,35 @@ Order By Count(*) DESC
 
 
 
+### 21.What is the average running length of movies in each genre?
+
+```sql
+
+```
+
+**Objective:** What is the average running length of movies in each genre?
+
+
+### 22. List directors who have directed both comedies and horror films.
+
+```sql
+
+```
+
+**Objective:** List directors who have directed both comedies and horror films.
+
+
+
+### 23. List the director's name and the number of horror and comedy films that he or she has directed.
+
+```sql
+
+```
+
+**Objective:** List the director's name and the number of horror and comedy films that he or she has directed.
+
+
+
 
 ### 24. Find the Most Common Rating for Movies and TV Shows
 
@@ -343,7 +372,7 @@ GROUP BY country, release_year
 ORDER BY avg_release DESC
 ```
 
-**Objective:** Find each year and the average numbers of content release in India on netflix and return top 5 year with highest avg content release!
+**Objective:** Calculate and rank years by the average number of content releases by India.
 
 
 
