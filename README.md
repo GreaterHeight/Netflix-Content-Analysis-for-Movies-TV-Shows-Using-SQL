@@ -340,6 +340,7 @@ SELECT TOP 5
 FROM netflix_titles
 WHERE country = 'India'
 GROUP BY country, release_year
+ORDER BY avg_release DESC
 ```
 
 **Objective:** Find each year and the average numbers of content release in India on netflix and return top 5 year with highest avg content release!
@@ -366,6 +367,7 @@ This project is part of our portfolio, showcasing the SQL skills essential for d
 For more content on SQL, data analysis, and other data-related topics, make sure to follow me on social media and join our community:
 
 - **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@TheSegunSamuel)
+- **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/TheSegunSamuel/)
 - **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/TheSegunSamuel)
 
 
