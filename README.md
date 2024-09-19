@@ -170,14 +170,16 @@ Order By CAST(trim(Value) AS INT) DESC
 
 ```sql
 SELECT 
-	*
+   *
 FROM 
-	(
-		SELECT 	*, Trim(value) AS director_name
-		FROM 
-			netflix_titles
-		CROSS APPLY STRING_SPLIT(director, ',')
-	) AS InnerTable
+(
+	SELECT 	
+		*, 
+		Trim(value) AS director_name
+	FROM 
+		netflix_titles
+	CROSS APPLY STRING_SPLIT(director, ',')
+) AS InnerTable
 WHERE 
 	director_name = 'Rajiv Chilaka';
 ```
@@ -364,5 +366,7 @@ This project is part of our portfolio, showcasing the SQL skills essential for d
 For more content on SQL, data analysis, and other data-related topics, make sure to follow me on social media and join our community:
 
 - **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@TheSegunSamuel)
-- **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/TheSegunSamuel/)
 - **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/TheSegunSamuel)
+
+
+
