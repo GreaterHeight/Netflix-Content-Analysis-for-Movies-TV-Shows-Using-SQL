@@ -21,8 +21,8 @@ Though the dataset for this project is sourced from the Kaggle dataset, but its 
 
 ```sql
 SELECT 
-	type,
-	COUNT(*) count_type
+   type,
+   COUNT(*) count_type
 FROM netflix_titles
 GROUP BY type
 ```
@@ -244,14 +244,8 @@ Where type='Movie' AND CAST(date_added AS DATE) BETWEEN '2021-01-01' AND '2021-1
 ### 18. Count the number of movies and tv series that each director has produced in different columns.
 
 ```sql
-Select
-  Trim(value) Director,
-  Count(*) Total_Count,
-  type
-  From Netflix_Titles
-  CROSS APPLY string_split(Director,',')
-  Group By Trim(Value),type
-  Order By Count(*)DESC
+
+
 ```
 
 **Objective:** Count the number of movies and tv series that each director has produced in different columns.
@@ -261,15 +255,7 @@ Select
 ### 19. Which country has highest number of comedy movies?
 
 ```sql
-	Select TOP(1)
-	Country,
-	Trim(value),
-	Count(*) Total_Count
-From Netflix_Titles
-Cross apply string_split(listed_in,',')
-Where Trim(Value) ='comedies'
-Group By Trim(value), country
-Order By Count(*)DESC
+
 ```
 
 **Objective:** Which country has highest number of comedy movies?
@@ -280,14 +266,8 @@ Order By Count(*)DESC
 ### 20. For each year, which director has maximum number of movies released
 
 ```sql
-Select 
-	Trim(Value) Director, 
-	release_year,
-	Count(*) Total_count
-From Netflix_Titles
-Cross apply string_split(director,',')
-Group By Trim(Value), release_year
-Order By Count(*) DESC
+
+
 ```
 
 **Objective:** For each year, which director has maximum number of movies released
@@ -389,7 +369,7 @@ This analysis provides a comprehensive view of Netflix's content and can help in
 
 ## Author - GreaterHeight Academy
 
-This project is part of our portfolio, showcasing the SQL skills essential for data analyst roles. If you have any questions, feedback, or would like to collaborate, feel free to get in touch!
+This project is part of our portfolio, showcasing the SQL skills essential for data analyst roles. If you have any questions, feedback, or would like to fraternize, feel free to get in touch!
 
 ### Stay Updated and Join the Community
 
@@ -398,6 +378,4 @@ For more content on SQL, data analysis, and other data-related topics, make sure
 - **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@TheSegunSamuel)
 - **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/TheSegunSamuel/)
 - **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/TheSegunSamuel)
-
-
 
