@@ -49,7 +49,7 @@ GROUP BY Trim(Value);
 ```sql
 SELECT * 
 FROM netflix
-WHERE release_year = 2020;
+WHERE type = 'Movie' AND release_year = 2020;
 ```
 
 **Objective:** Retrieve all movies released in a specific year.
@@ -335,7 +335,7 @@ WHERE rank = 1;
 
 
 
-### 25. Find the Most Common Rating for Movies and TV Shows
+### 25. Calculate and rank years by the average number of content releases by India.
 
 ```sql
 SELECT TOP 5
