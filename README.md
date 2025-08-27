@@ -79,7 +79,7 @@ ORDER BY total_content DESC
 ### 5. Find Content Added in the Last 5 Years
 
 ```sql
-5.	
+
 SELECT * from netflix_titles
 WHERE DATEDIFF(Year, date_added, GetDate()) >=5
 ```
@@ -132,7 +132,7 @@ Order BY COUNT(*) DESC
 
 **Objective:** Identify the top 10 actors with the most appearances in Indian-produced movies.
 
-### 10.Categorize Content Based on the Presence of 'Kill' and 'Violence' Keywords 
+### 10.  Categorize Content Based on the Presence of 'Kill' and 'Violence' Keywords 
 
 ```sql
 SELECT 
@@ -217,7 +217,7 @@ SELECT * from netflix_titles where CAST(date_added AS DATE) >= '2021-08-20'
 SELECT * from netflix_titles where type = 'Movie' AND CAST(date_added AS DATE) = '2019-06-15'
 ```
 
-**Objective:** Display movies added to on June 15, 2019
+**Objective:** Display movies added on June 15, 2019
 
 
 ### 16. Display content items added in 2021
@@ -257,14 +257,11 @@ ORDER BY director;
 
 ```
 
+**Version/Method 2:** 
+This version handles multiple directors in one row (using CROSS APPLY STRING_SPLIT), so if a title has "Director A, Director B", both get credited?
+
 
 ```sql
-
-/*
-Version/Method 2:
-This version handles multiple directors in one row (using CROSS APPLY STRING_SPLIT), so if a title has "Director A, Director B", both get credited?
-*/
-
 SELECT 
     LTRIM(RTRIM(director_split.value)) AS director,
     SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
@@ -273,11 +270,32 @@ FROM dbo.netflix_titles nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 
 ```
-
-
-
-
 **Objective:** Count the number of movies and tv series that each director has produced in different columns.
+
+
+### 18a. Count the number of movies and tv series that each director has produced in different columns,  include a TotalCount column Movies + TV Shows) for each director
+
+```sql
+SELECT 
+    LTRIM(RTRIM(director_split.value)) AS director,
+    SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
+    SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount,
+    COUNT(*) AS TotalCount
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
+WHERE nt.director IS NOT NULL
+GROUP BY LTRIM(RTRIM(director_split.value))
+ORDER BY TotalCount DESC, director;
+```
+**Objective:** Count the number of movies and tv series that each director has produced in different columns with  a TotalCount column Movies + TV Shows) for each director
+
+
+
+
+
+
+
+
 
 
 
