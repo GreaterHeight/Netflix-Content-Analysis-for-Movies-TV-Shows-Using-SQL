@@ -1,6 +1,6 @@
 # Netflix Movies/TV Shows End-to-End Data Analysis Project using SQL
 
-![Netflix Logo](https://github.com/GreaterHeight/Netflix_ELT_SQL_Project/blob/main/NetflixLogo.png)
+![Netflix Logo](https://github.com/GreaterHeight/Netflix_ETL_SQL_Project/blob/main/NetflixLogo.png)
 
 ## Overview
 This project requires a thorough examination of Netflix's movie and TV show data using SQL. The purpose is to extract relevant insights and answer a variety of (20+) business questions using the dataset. This paper details the project's objectives, business challenges, solutions, findings, and conclusions. 
@@ -290,7 +290,25 @@ ORDER BY TotalCount DESC, director;
 **Objective:** Count the number of movies and tv series that each director has produced in different columns with  a TotalCount column Movies + TV Shows) for each director
 
 
+### 18b. Count the number of movies and tv series that each director has produced in different columns, with TotalCount column (Movies + TV Shows) for each director, including percentage split of Movies vs TV Shows for each director.
 
+
+```sql
+SELECT 
+    LTRIM(RTRIM(director_split.value)) AS director,
+    SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
+    SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount,
+    COUNT(*) AS TotalCount,
+    CAST(100.0 * SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS MoviePercent,
+    CAST(100.0 * SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS TVShowPercent
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
+WHERE nt.director IS NOT NULL
+GROUP BY LTRIM(RTRIM(director_split.value))
+ORDER BY TotalCount DESC, director;
+
+```
+**Objective:** Count the number of movies and tv series that each director has produced in different columns with  a TotalCount column Movies + TV Shows) for each director
 
 
 
