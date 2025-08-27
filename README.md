@@ -211,7 +211,7 @@ SELECT * from netflix_titles where CAST(date_added AS DATE) >= '2021-08-20'
 
 **Objective:** Display content items added after August 20, 2021
 
-### 15. Display movies added to on June 15, 2019
+### 15. Display movies added on June 15, 2019
 
 ```sql
 SELECT * from netflix_titles where type = 'Movie' AND CAST(date_added AS DATE) = '2019-06-15'
@@ -314,35 +314,116 @@ ORDER BY TotalCount DESC, director;
 **Objective:** Count the number of movies and tv series that each director has produced in different columns with  a TotalCount column Movies + TV Shows) for each director
 
 
-
-
-
-
-
-
-### 19. Which country has highest number of comedy movies?
+### 18c. Count the number of movies and tv series that each director has produced in different columns, with TotalCount column (Movies + TV Shows) for each director, including percentage split of Movies vs TV Shows for each director. Show only the Top 5 directors ranked by their total number of titles
 
 ```sql
+SELECT TOP 5
+    LTRIM(RTRIM(director_split.value)) AS director,
+    SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
+    SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount,
+    COUNT(*) AS TotalCount,
+    CAST(100.0 * SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS MoviePercent,
+    CAST(100.0 * SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS TVShowPercent
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
+WHERE nt.director IS NOT NULL
+GROUP BY LTRIM(RTRIM(director_split.value))
+ORDER BY TotalCount DESC, director;
 
 ```
-
-**Objective:** Which country has highest number of comedy movies?
-
+**Objective:** Count the number of movies and tv series that each director has produced in different columns with  a TotalCount column Movies + TV Shows) for each director
 
 
 
-### 20. For each year, which director has maximum number of movies released
+
+
+### 19. Which country has the highest number of comedy movies?
+
+**Version/Method 1:** 
+This version handles without considering tie
 
 ```sql
-
-
+SELECT TOP 1
+    country,
+    COUNT(*) AS ComedyMovieCount        
+FROM dbo.netflix_titles
+WHERE type = 'Movie'
+    AND listed_in LIKE '%Comedy%'
+    AND country IS NOT NULL
+GROUP BY country
+ORDER BY ComedyMovieCount DESC
 ```
 
-**Objective:** For each year, which director has maximum number of movies released
+
+**Version/Method 2:** 
+This version finds the country (or countries, in case of a tie) with the highest number of comedy movies:
+
+
+```sql
+SELECT country, ComedyMovieCount
+FROM (
+    SELECT 
+        country,
+        COUNT(*) AS ComedyMovieCount,
+        RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk
+    FROM dbo.netflix_titles
+    WHERE type = 'Movie'
+      AND listed_in LIKE '%Comedy%'
+      AND country IS NOT NULL
+    GROUP BY country
+) ranked
+WHERE rnk = 1;
+```
+**Objective:** Which country has the highest number of comedy movies?
 
 
 
-### 21.What is the average running length of movies in each genre?
+
+### 20. For each year, which director has the maximum number of movies released
+
+**Version/Method 1:** 
+This version handles without considering tie
+```sql
+
+    SELECT 
+        nt.release_year,
+        TRIM(d.value) AS director,
+        COUNT(*) AS MovieCount 
+    FROM dbo.netflix_titles nt
+    CROSS APPLY STRING_SPLIT(nt.director, ',') d
+    WHERE nt.type = 'Movie'
+      AND nt.director IS NOT NULL
+      AND nt.release_year IS NOT NULL
+    GROUP BY nt.release_year, TRIM(d.value)
+```
+
+
+**Version/Method 2:** 
+
+```sql
+SELECT release_year, director, MovieCount
+FROM (
+    SELECT 
+        nt.release_year,
+        TRIM(d.value) AS director,
+        COUNT(*) AS MovieCount,
+        MAX(COUNT(*)) OVER (PARTITION BY nt.release_year) AS MaxMoviesInYear
+    FROM dbo.netflix_titles nt
+    CROSS APPLY STRING_SPLIT(nt.director, ',') d
+    WHERE nt.type = 'Movie'
+      AND nt.director IS NOT NULL
+      AND nt.release_year IS NOT NULL
+    GROUP BY nt.release_year, TRIM(d.value)
+) sub
+WHERE MovieCount = MaxMoviesInYear
+ORDER BY release_year, director;
+```
+
+**Objective:** For each year, which director has the maximum number of movies released
+
+
+
+### 21. What is the average running length of movies in each genre?
 
 ```sql
 
