@@ -190,6 +190,8 @@ WHERE
 
 ### 13. List All TV Shows with More Than 5 Seasons
 
+**Versio/Method 1:** 
+
 ```sql
 SELECT Title, 
 	Trim(Value) Value
@@ -199,6 +201,17 @@ WHERE TYPE = 'TV Show' AND Ordinal = 1
 AND TRY_CAST(VALUE AS INT) > 5 
 ORDER BY CAST(VALUE AS INT) DESC
 ```
+
+**Versio/Method 2:** 
+```sql
+SELECT *
+FROM dbo.netflix_titles
+WHERE type = 'TV Show'
+  AND TRY_CAST(LEFT(duration, CHARINDEX(' ', duration + ' ') - 1) AS INT) > 5;
+```
+
+
+
 
 **Objective:** Identify TV shows with more than 5 seasons.
 
