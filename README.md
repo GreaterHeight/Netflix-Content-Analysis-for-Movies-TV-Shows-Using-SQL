@@ -255,8 +255,27 @@ WHERE director IS NOT NULL
 GROUP BY director
 ORDER BY director;
 
+```
+
+
+```sql
+
+/*
+Version/Method 2:
+This version handles multiple directors in one row (using CROSS APPLY STRING_SPLIT), so if a title has "Director A, Director B", both get credited?
+*/
+
+SELECT 
+    LTRIM(RTRIM(director_split.value)) AS director,
+    SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
+    SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 
 ```
+
+
+
 
 **Objective:** Count the number of movies and tv series that each director has produced in different columns.
 
