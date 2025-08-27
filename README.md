@@ -1,5 +1,7 @@
 # Netflix Movies and TV Shows End-to-End Data Analysis Project using SQL
 
+[]()
+
 ## Overview
 This project requires a thorough examination of Netflix's movie and TV show data using SQL. The purpose is to extract relevant insights and answer a variety of (20+) business questions using the dataset. This paper details the project's objectives, business challenges, solutions, findings, and conclusions. 
 
@@ -244,6 +246,14 @@ Where type='Movie' AND CAST(date_added AS DATE) BETWEEN '2021-01-01' AND '2021-1
 ### 18. Count the number of movies and tv series that each director has produced in different columns.
 
 ```sql
+SELECT 
+    director,
+    SUM(CASE WHEN type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
+    SUM(CASE WHEN type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount
+FROM dbo.netflix_titles
+WHERE director IS NOT NULL
+GROUP BY director
+ORDER BY director;
 
 
 ```
