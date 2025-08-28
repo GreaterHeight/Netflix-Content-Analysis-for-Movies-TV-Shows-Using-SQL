@@ -237,6 +237,7 @@ SELECT * from netflix_titles where type = 'Movie' AND CAST(date_added AS DATE) =
 SELECT * FROM dbo.netflix_titles WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
 ```
 
+### 15b. Show just the Count of movies added on June 15, 2019
 
 ```sql
 	-- Show the count of movies added on June 15, 2019
