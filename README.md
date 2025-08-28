@@ -16,32 +16,33 @@ This project requires a thorough examination of Netflix's movie and TV show data
 
 Though the dataset for this project is sourced from the Kaggle dataset, but its uploaded here: Netflix_titles.csv 
 
-
 ## Business Problems and Solutions
 
 ### 1. Display the total Number of Movies vs TV Shows
 
 ```sql
+
 SELECT 
    type,
    COUNT(*) count_type
 FROM netflix_titles
 GROUP BY type
+
 ```
 
 **Objective:** Determine the distribution of content types on Netflix.
 
-
-
 ### 2. Count the Number of Content Items in Each Genre
 
 ```sql
-SELECT 
-	Trim(Value) AS genre,  
-	COUNT(*) AS total_content  
-FROM netflix_titles
-   CROSS APPLY string_split (listed_in, ',') 
-GROUP BY Trim(Value);
+
+	SELECT 
+		Trim(Value) AS genre,  
+		COUNT(*) AS total_content  
+	FROM netflix_titles
+	   CROSS APPLY string_split (listed_in, ',') 
+	GROUP BY Trim(Value);
+
 ```
 
 **Objective:** Objective: Count the number of content items in each genre.
@@ -210,9 +211,6 @@ WHERE type = 'TV Show'
   AND TRY_CAST(LEFT(duration, CHARINDEX(' ', duration + ' ') - 1) AS INT) > 5;
 ```
 
-
-
-
 **Objective:** Identify TV shows with more than 5 seasons.
 
 ### 14. Display content items added after August 20, 2021
@@ -246,10 +244,10 @@ SELECT * from netflix_titles where Year(CAST(date_added AS DATE)) = 2021
 ### 17. Display movies added in 2021
 
 ```sql
-SELECT 
-* from 
-netflix_titles 
-Where type='Movie' AND CAST(date_added AS DATE) BETWEEN '2021-01-01' AND '2021-12-31'
+	SELECT 
+	* from 
+	netflix_titles 
+	Where type='Movie' AND CAST(date_added AS DATE) BETWEEN '2021-01-01' AND '2021-12-31'
 ```
 
 **Objective:** Display movies added in 2021
@@ -259,31 +257,17 @@ Where type='Movie' AND CAST(date_added AS DATE) BETWEEN '2021-01-01' AND '2021-1
 ### 18. Count the number of movies and tv series that each director has produced in different columns.
 
 
-**Version/Method 1:** 
-
-```sql
-SELECT 
-    director,
-    SUM(CASE WHEN type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
-    SUM(CASE WHEN type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount
-FROM dbo.netflix_titles
-WHERE director IS NOT NULL
-GROUP BY director
-ORDER BY director;
-
-```
-
-**Version/Method 2:** 
 This version handles multiple directors in one row (using CROSS APPLY STRING_SPLIT), so if a title has "Director A, Director B", both get credited?
 
 
 ```sql
 SELECT 
-    LTRIM(RTRIM(director_split.value)) AS director,
+    TRIM(director_split.value) AS director,
     SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
     SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount
 FROM dbo.netflix_titles nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
+GROUP BY TRIM(director_split.value) 
 
 ```
 **Objective:** Count the number of movies and tv series that each director has produced in different columns.
@@ -356,12 +340,12 @@ ORDER BY TotalCount DESC, director;
 This version handles without considering tie
 
 ```sql
-SELECT TOP 1
+ SELECT TOP 1
     country,
     COUNT(*) AS ComedyMovieCount        
 FROM dbo.netflix_titles
 WHERE type = 'Movie'
-    AND listed_in LIKE '%Comedy%'
+    AND listed_in LIKE '%comedies%'
     AND country IS NOT NULL
 GROUP BY country
 ORDER BY ComedyMovieCount DESC
@@ -370,7 +354,6 @@ ORDER BY ComedyMovieCount DESC
 
 **Version/Method 2:** 
 This version finds the country (or countries, in case of a tie) with the highest number of comedy movies:
-
 
 ```sql
 SELECT country, ComedyMovieCount
@@ -439,8 +422,17 @@ ORDER BY release_year, director;
 ### 21. What is the average running length of movies in each genre?
 
 ```sql
+SELECT 
+    TRIM(g.value) AS Genre,
+    COUNT(*) AS MovieCount,
+    AVG(TRY_CAST(REPLACE(nt.duration, ' min', '') AS INT)) AS AvgRuntimeMinutes
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
+WHERE nt.type = 'Movie'
+  AND nt.duration LIKE '%min%'
+GROUP BY TRIM(g.value)
+ORDER BY AvgRuntimeMinutes DESC;
 
-```
 
 **Objective:** What is the average running length of movies in each genre?
 
@@ -448,6 +440,20 @@ ORDER BY release_year, director;
 ### 22. List directors who have directed both comedies and horror films.
 
 ```sql
+SELECT 
+    LTRIM(RTRIM(d.value)) AS Director,
+    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount,
+    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.director, ',') d
+CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
+WHERE nt.type = 'Movie'
+  AND nt.director IS NOT NULL
+  AND LTRIM(RTRIM(g.value)) IN ('Comedies', 'Horror Movies')
+GROUP BY LTRIM(RTRIM(d.value))
+HAVING SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Comedies' THEN 1 ELSE 0 END) > 0
+   AND SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Horror Movies' THEN 1 ELSE 0 END) > 0
+ORDER BY Director;
 
 ```
 
