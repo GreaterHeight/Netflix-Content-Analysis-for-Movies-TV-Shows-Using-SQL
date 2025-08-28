@@ -458,7 +458,18 @@ ORDER BY release_year, director;
 ### 23. List the director's name and the number of horror and comedy films that he or she has directed.
 
 ```sql
-
+SELECT 
+    LTRIM(RTRIM(d.value)) AS Director,
+    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount,
+    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.director, ',') d
+CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
+WHERE nt.type = 'Movie'
+  AND nt.director IS NOT NULL
+GROUP BY LTRIM(RTRIM(d.value))
+HAVING SUM(CASE WHEN LTRIM(RTRIM(g.value)) IN ('Horror Movies','Comedies') THEN 1 ELSE 0 END) > 0
+ORDER BY Director;
 ```
 
 **Objective:** List the director's name and the number of horror and comedy films that he or she has directed.
