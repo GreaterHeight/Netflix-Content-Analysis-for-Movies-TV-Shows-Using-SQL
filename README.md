@@ -226,6 +226,27 @@ SELECT * from netflix_titles where CAST(date_added AS DATE) >= '2021-08-20'
 
 ```sql
 SELECT * from netflix_titles where type = 'Movie' AND CAST(date_added AS DATE) = '2019-06-15'
+
+```
+
+
+```sql
+
+If the date_added column in your table is stored as text (e.g., "June 15, 2019"), we can either:
+- Compare it directly as a string, or
+- Convert it into a DATE type using TRY_CONVERT for safer querying.
+
+SELECT * FROM dbo.netflix_titles WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
+```
+
+
+```sql
+
+	-- Show the count of movies added on June 15, 2019
+	SELECT COUNT(*) AS MoviesAddedCount
+	FROM dbo.netflix_titles
+	WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
+
 ```
 
 **Objective:** Display movies added on June 15, 2019
