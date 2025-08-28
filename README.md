@@ -246,6 +246,20 @@ SELECT * FROM dbo.netflix_titles WHERE TRY_CONVERT(DATE, date_added, 107) = '201
 	WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
 ```
 
+
+### 15c. Count of titles by Type (Movies vs TV Shows) on June 15, 2019
+
+```sql
+	-- Count of titles by Type (Movies vs TV Shows) on June 15, 2019
+SELECT 
+    type,
+    COUNT(*) AS TitlesAddedCount
+FROM dbo.netflix_titles
+WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15'
+GROUP BY type;
+```
+
+
 **Objective:** Display movies added on June 15, 2019
 
 
