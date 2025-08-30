@@ -18,7 +18,7 @@ Though the dataset for this project is sourced from the Kaggle dataset but **it'
 
 ## Business Problems and Solutions
 
-## Processes and Stages
+### Processes and Stages
 - This ....
 
 
@@ -470,7 +470,7 @@ WHERE nt.type = 'Movie'
   AND nt.duration LIKE '%min%'
 GROUP BY TRIM(g.value)
 ORDER BY AvgRuntimeMinutes DESC;
-
+```
 
 **Objective:** What is the average running length of movies in each genre?
 
@@ -479,18 +479,18 @@ ORDER BY AvgRuntimeMinutes DESC;
 
 ```sql
 SELECT 
-    LTRIM(RTRIM(d.value)) AS Director,
-    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount,
-    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount
+    TRIM(d.value) AS Director,
+    SUM(CASE WHEN TRIM(g.value) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount,
+    SUM(CASE WHEN TRIM(g.value) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount
 FROM dbo.netflix_titles nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') d
 CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
 WHERE nt.type = 'Movie'
   AND nt.director IS NOT NULL
-  AND LTRIM(RTRIM(g.value)) IN ('Comedies', 'Horror Movies')
-GROUP BY LTRIM(RTRIM(d.value))
-HAVING SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Comedies' THEN 1 ELSE 0 END) > 0
-   AND SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Horror Movies' THEN 1 ELSE 0 END) > 0
+  AND TRIM(g.value) IN ('Comedies', 'Horror Movies')
+GROUP BY TRIM(d.value)
+HAVING SUM(CASE WHEN TRIM(g.value) = 'Comedies' THEN 1 ELSE 0 END) > 0
+   AND SUM(CASE WHEN TRIM(g.value) = 'Horror Movies' THEN 1 ELSE 0 END) > 0
 ORDER BY Director;
 
 ```
@@ -503,16 +503,16 @@ ORDER BY Director;
 
 ```sql
 SELECT 
-    LTRIM(RTRIM(d.value)) AS Director,
-    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount,
-    SUM(CASE WHEN LTRIM(RTRIM(g.value)) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount
+    TRIM(d.value) AS Director,
+    SUM(CASE WHEN TRIM(g.value) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount,
+    SUM(CASE WHEN TRIM(g.value) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount
 FROM dbo.netflix_titles nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') d
 CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
 WHERE nt.type = 'Movie'
   AND nt.director IS NOT NULL
-GROUP BY LTRIM(RTRIM(d.value))
-HAVING SUM(CASE WHEN LTRIM(RTRIM(g.value)) IN ('Horror Movies','Comedies') THEN 1 ELSE 0 END) > 0
+GROUP BY TRIM(d.value)
+HAVING SUM(CASE WHEN RTRIM(g.value) IN ('Horror Movies','Comedies') THEN 1 ELSE 0 END) > 0
 ORDER BY Director;
 ```
 
