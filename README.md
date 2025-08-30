@@ -457,7 +457,7 @@ FROM (
         RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk
     FROM dbo.netflix_titles
     WHERE type = 'Movie'
-      AND listed_in LIKE '%Comedy%'
+      AND listed_in LIKE '%comedies%'
       AND country IS NOT NULL
     GROUP BY country
 ) ranked
