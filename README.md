@@ -16,12 +16,68 @@ This project requires a thorough examination of Netflix's movie and TV show data
 
 Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.tech/NetflixContents.csv)
 
+
+## Processes and Stages
+**Step 1:** Download the **dataset from:** [Netflix Dataset](https://greaterheight.tech/NetflixContent.csv)
+**Step 2:** Open the NetflixContent.csv file and explore it to determine the column names.
+**Step 3:** Execute the SQL code below:
+
+```sql
+CREATE DATABASE MoviesDB
+GO
+
+USE MoviesDB
+GO
+
+CREATE TABLE NetflixContent
+(
+	ShowID nvarchar(MAX) NOT NULL,
+	Type nvarchar(MAX) NULL,
+	Title nvarchar(MAX) NULL,
+	Director nvarchar(MAX) NULL,
+	Cast nvarchar(MAX) NULL,
+	Country nvarchar(MAX) NULL,
+	DateAdded nvarchar(MAX) NULL,
+	ReleaseYear smallint NULL,
+	Rating nvarchar(MAX) NULL,
+	Duration nvarchar(MAX) NULL,
+	ListedIn nvarchar(MAX) NULL,
+	Description nvarchar(MAX) NULL
+)
+GO
+```
+**Result** 
+- MoviesDB database will be created
+- NetflixContent table will be created
+
+
+**Step 4:** Execute the SQL code below. The code inserts all the records into NetflixContent
+
+```sql
+BULK INSERT NetflixContent
+FROM 'C:\...\NetflixContent.csv'		--specify the folder where you downloaded the file
+WITH (
+   FORMAT = 'CSV',
+	FIELDTERMINATOR = ',',  -- Specifies the column delimiter
+    ROWTERMINATOR = '\n',   -- Specifies the row terminator (newline character)
+    FIRSTROW = 2,            -- Optional: Skips the header row if present
+	TABLOCK
+);
+Go
+```
+
+**Step 5:** Execute the SQL code below. Make a backup copy of NetflixContent
+
+```sql
+
+--Before you do anything on the imported data, we make a backup copy of NetflixContent
+
+SELECT * INTO NetflixContent_stagging
+FROM NetflixContent
+```
+
+
 ## Business Problems and Solutions
-
-### Processes and Stages
-- This ....
-
-
 
 
 ### 1. Display the total Number of Movies vs TV Shows
