@@ -59,7 +59,7 @@ GROUP BY type
 SELECT * 
 FROM netflix
 WHERE type = 'Movie' AND release_year = 2020;
-```
+``` 
 
 **Objective:** Retrieve all movies released in a specific year.
 
@@ -333,7 +333,7 @@ ORDER BY TotalCount DESC, director;
 
 ```sql
 SELECT 
-    LTRIM(RTRIM(director_split.value)) AS director,
+    TRIM(director_split.value) AS director,
     SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
     SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount,
     COUNT(*) AS TotalCount,
@@ -342,9 +342,8 @@ SELECT
 FROM dbo.netflix_titles nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 WHERE nt.director IS NOT NULL
-GROUP BY LTRIM(RTRIM(director_split.value))
+GROUP BY TRIM(director_split.value)
 ORDER BY TotalCount DESC, director;
-
 ```
 **Objective:** Count the number of movies and tv series that each director has produced in different columns with  a TotalCount column Movies + TV Shows) for each director
 
@@ -353,7 +352,7 @@ ORDER BY TotalCount DESC, director;
 
 ```sql
 SELECT TOP 5
-    LTRIM(RTRIM(director_split.value)) AS director,
+    TRIM(director_split.value) AS director,
     SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
     SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount,
     COUNT(*) AS TotalCount,
@@ -362,7 +361,7 @@ SELECT TOP 5
 FROM dbo.netflix_titles nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 WHERE nt.director IS NOT NULL
-GROUP BY LTRIM(RTRIM(director_split.value))
+GROUP BY TRIM(director_split.value)
 ORDER BY TotalCount DESC, director;
 
 ```
