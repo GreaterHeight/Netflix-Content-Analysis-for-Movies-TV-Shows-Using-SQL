@@ -14,7 +14,7 @@ This project requires a thorough examination of Netflix's movie and TV show data
 
 ## Dataset
 
-Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.tech\Netflix_titles.csv)
+Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.tech/NetflixContents.csv)
 
 ## Business Problems and Solutions
 
