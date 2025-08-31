@@ -19,7 +19,9 @@ Though the dataset for this project is sourced from the Kaggle dataset but **it'
 
 ## Processes and Stages
 **Step 1:** Download the **dataset from:** [Netflix Dataset](https://greaterheight.tech/NetflixContent.csv)
+
 **Step 2:** Open the NetflixContent.csv file and explore it to determine the column names.
+
 **Step 3:** Execute the SQL code below:
 
 ```sql
@@ -626,6 +628,51 @@ ORDER BY avg_release DESC
 
 **Objective:** Calculate and rank years by the average number of content releases by India.
 
+
+
+
+### 26. Calculate the average age of movies in the top 10 countries (by number of movies)
+
+**Version 1:** 
+
+```sql
+SELECT TOP 10 
+       TRIM(country_split.value), 
+       AVG(YEAR(GETDATE()) - release_year) AS AvgMovieAge,
+       COUNT(*) AS MovieCount
+FROM dbo.netflix_titles nt
+CROSS APPLY STRING_SPLIT(nt.country, ',') AS country_split
+WHERE nt.type = 'Movie'
+  AND nt.country IS NOT NULL
+GROUP BY TRIM(country_split.value)
+ORDER BY COUNT(*) DESC
+go
+```
+
+
+**Version 2:** 
+This version shows with ties included (so if multiple countries tie for 10th place, they all appear)
+
+```sql
+SELECT country, AvgMovieAge, MovieCount
+FROM (
+    SELECT 
+        TRIM(country_split.value) AS country,
+        AVG(YEAR(GETDATE()) - release_year) AS AvgMovieAge,
+        COUNT(*) AS MovieCount,
+        RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk
+    FROM dbo.netflix_titles nt
+    CROSS APPLY STRING_SPLIT(nt.country, ',') AS country_split
+    WHERE nt.type = 'Movie'
+      AND nt.country IS NOT NULL
+    GROUP BY TRIM(country_split.value)
+) ranked
+WHERE rnk <= 10
+ORDER BY MovieCount DESC, country;
+
+```
+
+**Objective:** Calculate the average age of movies in the top 10 countries (by number of movies)
 
 
 ## Findings and Conclusion
