@@ -78,9 +78,46 @@ SELECT * INTO NetflixContent_stagging
 FROM NetflixContent
 ```
 
+### Dataset Cleaning Script
+
+### Step 1. Handle Missing Values
+
+```sql
+--Handle Missing Values
+UPDATE dbo.netflix_titles
+SET director = ISNULL(director, 'Unknown'),
+    cast = ISNULL(cast, 'Unknown'),
+    country = ISNULL(country, 'Unknown'),
+    rating = ISNULL(rating, 'Not Rated'),
+    duration = ISNULL(duration, 'Unknown');
+```
+
+### Step 2. Convert DateAded to proper DATE format
+
+```sql
+-- Since DateAdded column is NVARCHAR, change it to DATE
+ALTER TABLE NetflixContent
+ALTER COLUMN DateAded DATE;
+
+-- NOTE: If some rows cannot be converted, force conversion first
+UPDATE NetflixContent
+SET date_added = TRY_CONVERT(DATE, DateAded);
+
+```
+
+### Step 4. Clean Text Fields (remove leading/trailing spaces)
+----------------------------------------------------------
+-- 4. Clean Text Fields (remove leading/trailing spaces)
+----------------------------------------------------------
+UPDATE NetflixContent
+SET title      = LTRIM(RTRIM(Title)),
+    Director   = LTRIM(RTRIM(Director)),
+    Cast       = LTRIM(RTRIM(Cast)),
+    Country    = LTRIM(RTRIM(Country)),
+    ListedIn  = LTRIM(RTRIM(ListedIn));
+
 
 ## Business Problems and Solutions
-
 
 ### 1. Display the total Number of Movies vs TV Shows
 
