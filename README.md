@@ -17,7 +17,7 @@ This project requires a thorough examination of Netflix's movie and TV show data
 Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.tech/NetflixContents.csv)
 
 
-## Processes and Stages
+## Get dataset, Create Database & Table
 **Step 1:** Download the **dataset from:** [Netflix Dataset](https://greaterheight.tech/NetflixContent.csv)
 
 **Step 2:** Open the NetflixContent.csv file and explore it to determine the column names.
@@ -105,16 +105,29 @@ SET date_added = TRY_CONVERT(DATE, DateAded);
 
 ```
 
-### Step 4. Clean Text Fields (remove leading/trailing spaces)
-----------------------------------------------------------
--- 4. Clean Text Fields (remove leading/trailing spaces)
-----------------------------------------------------------
+### Step 3. Clean Text Fields (remove leading/trailing spaces)
+```sql
+
 UPDATE NetflixContent_stagging
 SET title      = LTRIM(RTRIM(Title)),
     Director   = LTRIM(RTRIM(Director)),
     Cast       = LTRIM(RTRIM(Cast)),
     Country    = LTRIM(RTRIM(Country)),
     ListedIn  = LTRIM(RTRIM(ListedIn));
+
+```
+
+### Step 4. Standardize Country Names
+```sql
+
+UPDATE NetflixContent_Stagging
+SET country = CASE 
+                 WHEN Country IN ('USA', 'United States of America') THEN 'United States'
+                 WHEN Country = 'UK' THEN 'United Kingdom'
+                 ELSE Country
+              END;
+
+```
 
 
 ## Business Problems and Solutions
