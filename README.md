@@ -78,13 +78,13 @@ SELECT * INTO NetflixContent_stagging
 FROM NetflixContent
 ```
 
-### Dataset Cleaning Script
+## Dataset Cleaning 
 
 ### Step 1. Handle Missing Values
 
 ```sql
 --Handle Missing Values
-UPDATE dbo.netflix_titles
+UPDATE NetflixContent_stagging
 SET director = ISNULL(director, 'Unknown'),
     cast = ISNULL(cast, 'Unknown'),
     country = ISNULL(country, 'Unknown'),
@@ -96,11 +96,11 @@ SET director = ISNULL(director, 'Unknown'),
 
 ```sql
 -- Since DateAdded column is NVARCHAR, change it to DATE
-ALTER TABLE NetflixContent
+ALTER TABLE NetflixContent_stagging
 ALTER COLUMN DateAded DATE;
 
 -- NOTE: If some rows cannot be converted, force conversion first
-UPDATE NetflixContent
+UPDATE NetflixContent_stagging
 SET date_added = TRY_CONVERT(DATE, DateAded);
 
 ```
@@ -109,7 +109,7 @@ SET date_added = TRY_CONVERT(DATE, DateAded);
 ----------------------------------------------------------
 -- 4. Clean Text Fields (remove leading/trailing spaces)
 ----------------------------------------------------------
-UPDATE NetflixContent
+UPDATE NetflixContent_stagging
 SET title      = LTRIM(RTRIM(Title)),
     Director   = LTRIM(RTRIM(Director)),
     Cast       = LTRIM(RTRIM(Cast)),
@@ -126,7 +126,7 @@ SET title      = LTRIM(RTRIM(Title)),
 SELECT 
    type,
    COUNT(*) count_type
-FROM netflix_titles
+FROM NetflixContent_stagging
 GROUP BY type
 
 ```
@@ -140,7 +140,7 @@ GROUP BY type
 	SELECT 
 		Trim(Value) AS genre,  
 		COUNT(*) AS total_content  
-	FROM netflix_titles
+	FROM NetflixContent_stagging
 	   CROSS APPLY string_split (listed_in, ',') 
 	GROUP BY Trim(Value);
 
@@ -167,7 +167,7 @@ FROM
 	SELECT 
 	Trim(Value) AS country,  
 	COUNT(*) AS total_content  
-	FROM netflix_titles
+	FROM NetflixContent_stagging
 	   CROSS APPLY string_split (country, ',') 
 	GROUP BY Trim(Value)
 
@@ -182,7 +182,7 @@ ORDER BY total_content DESC
 
 ```sql
 
-SELECT * from netflix_titles
+SELECT * from NetflixContent_stagging
 WHERE DATEDIFF(Year, date_added, GetDate()) >=5
 ```
 
@@ -192,7 +192,7 @@ WHERE DATEDIFF(Year, date_added, GetDate()) >=5
 
 ```sql
 SELECT * 
-FROM Netflix_titles
+FROM NetflixContent_stagging
 WHERE listed_in LIKE '%Documentaries';
 ```
 
@@ -212,7 +212,7 @@ WHERE director IS NULL;
 
 ```sql
 SELECT * 
-FROM netflix_titles
+FROM NetflixContent_stagging
 WHERE cast LIKE '%Salman Khan%'
 AND release_year > Year(GetDate()) - 10;
 ```
@@ -225,7 +225,7 @@ AND release_year > Year(GetDate()) - 10;
 SELECT TOP(10)
 	Trim(Value) AS Actor,
 	COUNT(*) HighestNumber
-FROM netflix_titles
+FROM NetflixContent_stagging
 CROSS APPLY STRING_SPLIT(cast,',')
 WHERE country LIKE '%India%' AND type = 'Movie'
 GROUP BY Trim(Value)
@@ -246,7 +246,7 @@ FROM (
             WHEN description LIKE '%kill%' OR description LIKE '%violence%' THEN 'Bad'
             ELSE 'Good'
         END AS category
-    FROM netflix_titles
+    FROM NetflixContent_stagging
 ) AS categorized_content
 GROUP BY category;
 ```
@@ -262,7 +262,7 @@ SELECT
 	title, 
 	trim(Value) total_minute, 
 	duration
-FROM netflix_titles
+FROM NetflixContent_stagging
 CROSS APPLY string_split(duration, ' ', 1)
 WHERE type = 'Movie' and Ordinal = 1
 Order By CAST(trim(Value) AS INT) DESC
@@ -281,7 +281,7 @@ FROM
 		*, 
 		Trim(value) AS director_name
 	FROM 
-		netflix_titles
+		NetflixContent_stagging
 	CROSS APPLY STRING_SPLIT(director, ',')
 ) AS InnerTable
 WHERE 
@@ -297,7 +297,7 @@ WHERE
 ```sql
 SELECT Title, 
 	Trim(Value) Value
-FROM netflix_titles
+FROM NetflixContent_stagging
 CROSS APPLY STRING_SPLIT(Duration, ' ',1)
 WHERE TYPE = 'TV Show' AND Ordinal = 1
 AND TRY_CAST(VALUE AS INT) > 5 
@@ -307,7 +307,7 @@ ORDER BY CAST(VALUE AS INT) DESC
 **Versio/Method 2:** 
 ```sql
 SELECT *
-FROM dbo.netflix_titles
+FROM NetflixContent_stagging
 WHERE type = 'TV Show'
   AND TRY_CAST(LEFT(duration, CHARINDEX(' ', duration + ' ') - 1) AS INT) > 5;
 ```
@@ -318,7 +318,7 @@ WHERE type = 'TV Show'
 
 
 ```sql
-SELECT * from netflix_titles where CAST(date_added AS DATE) >= '2021-08-20'
+SELECT * from NetflixContent_stagging where CAST(date_added AS DATE) >= '2021-08-20'
 ```
 
 **Objective:** Display content items added after August 20, 2021
@@ -326,7 +326,7 @@ SELECT * from netflix_titles where CAST(date_added AS DATE) >= '2021-08-20'
 ### 15. Display movies added on June 15, 2019
 
 ```sql
-SELECT * from netflix_titles where type = 'Movie' AND CAST(date_added AS DATE) = '2019-06-15'
+SELECT * from NetflixContent_stagging where type = 'Movie' AND CAST(date_added AS DATE) = '2019-06-15'
 
 ```
 
@@ -335,7 +335,7 @@ SELECT * from netflix_titles where type = 'Movie' AND CAST(date_added AS DATE) =
 - Convert it into a DATE type using TRY_CONVERT for safer querying.
 
 ```sql
-SELECT * FROM dbo.netflix_titles WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
+SELECT * FROM NetflixContent_stagging WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
 ```
 
 ### 15b. Show just the Count of movies added on June 15, 2019
@@ -343,7 +343,7 @@ SELECT * FROM dbo.netflix_titles WHERE TRY_CONVERT(DATE, date_added, 107) = '201
 ```sql
 	-- Show the count of movies added on June 15, 2019
 	SELECT COUNT(*) AS MoviesAddedCount
-	FROM dbo.netflix_titles
+	FROM NetflixContent_stagging
 	WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15';
 ```
 
@@ -355,7 +355,7 @@ SELECT * FROM dbo.netflix_titles WHERE TRY_CONVERT(DATE, date_added, 107) = '201
 SELECT 
     type,
     COUNT(*) AS TitlesAddedCount
-FROM dbo.netflix_titles
+FROM NetflixContent_stagging
 WHERE TRY_CONVERT(DATE, date_added, 107) = '2019-06-15'
 GROUP BY type;
 ```
@@ -367,7 +367,7 @@ GROUP BY type;
 ### 16. Display content items added in 2021
 
 ```sql
-SELECT * from netflix_titles where Year(CAST(date_added AS DATE)) = 2021
+SELECT * from NetflixContent_stagging where Year(CAST(date_added AS DATE)) = 2021
 ```
 
 **Objective:** Display content items added in 2021
@@ -379,7 +379,7 @@ SELECT * from netflix_titles where Year(CAST(date_added AS DATE)) = 2021
 ```sql
 	SELECT 
 	* from 
-	netflix_titles 
+	NetflixContent_stagging 
 	Where type='Movie' AND CAST(date_added AS DATE) BETWEEN '2021-01-01' AND '2021-12-31'
 ```
 
@@ -398,7 +398,7 @@ SELECT
     TRIM(director_split.value) AS director,
     SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
     SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 GROUP BY TRIM(director_split.value) 
 
@@ -414,7 +414,7 @@ SELECT
     SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) AS MovieCount,
     SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) AS TVShowCount,
     COUNT(*) AS TotalCount
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 WHERE nt.director IS NOT NULL
 GROUP BY LTRIM(RTRIM(director_split.value))
@@ -434,7 +434,7 @@ SELECT
     COUNT(*) AS TotalCount,
     CAST(100.0 * SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS MoviePercent,
     CAST(100.0 * SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS TVShowPercent
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 WHERE nt.director IS NOT NULL
 GROUP BY TRIM(director_split.value)
@@ -453,7 +453,7 @@ SELECT TOP 5
     COUNT(*) AS TotalCount,
     CAST(100.0 * SUM(CASE WHEN nt.type = 'Movie' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS MoviePercent,
     CAST(100.0 * SUM(CASE WHEN nt.type = 'TV Show' THEN 1 ELSE 0 END) / COUNT(*) AS DECIMAL(5,2)) AS TVShowPercent
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') AS director_split
 WHERE nt.director IS NOT NULL
 GROUP BY TRIM(director_split.value)
@@ -475,7 +475,7 @@ This version handles without considering tie
  SELECT TOP 1
     country,
     COUNT(*) AS ComedyMovieCount        
-FROM dbo.netflix_titles
+FROM NetflixContent_stagging
 WHERE type = 'Movie'
     AND listed_in LIKE '%comedies%'
     AND country IS NOT NULL
@@ -494,7 +494,7 @@ FROM (
         country,
         COUNT(*) AS ComedyMovieCount,
         RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk
-    FROM dbo.netflix_titles
+    FROM NetflixContent_stagging
     WHERE type = 'Movie'
       AND listed_in LIKE '%comedies%'
       AND country IS NOT NULL
@@ -517,7 +517,7 @@ This version handles without considering tie
         nt.release_year,
         TRIM(d.value) AS director,
         COUNT(*) AS MovieCount 
-    FROM dbo.netflix_titles nt
+    FROM NetflixContent_stagging nt
     CROSS APPLY STRING_SPLIT(nt.director, ',') d
     WHERE nt.type = 'Movie'
       AND nt.director IS NOT NULL
@@ -536,7 +536,7 @@ FROM (
         TRIM(d.value) AS director,
         COUNT(*) AS MovieCount,
         MAX(COUNT(*)) OVER (PARTITION BY nt.release_year) AS MaxMoviesInYear
-    FROM dbo.netflix_titles nt
+    FROM NetflixContent_stagging nt
     CROSS APPLY STRING_SPLIT(nt.director, ',') d
     WHERE nt.type = 'Movie'
       AND nt.director IS NOT NULL
@@ -558,7 +558,7 @@ SELECT
     TRIM(g.value) AS Genre,
     COUNT(*) AS MovieCount,
     AVG(TRY_CAST(REPLACE(nt.duration, ' min', '') AS INT)) AS AvgRuntimeMinutes
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
 WHERE nt.type = 'Movie'
   AND nt.duration LIKE '%min%'
@@ -576,7 +576,7 @@ SELECT
     TRIM(d.value) AS Director,
     SUM(CASE WHEN TRIM(g.value) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount,
     SUM(CASE WHEN TRIM(g.value) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') d
 CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
 WHERE nt.type = 'Movie'
@@ -600,7 +600,7 @@ SELECT
     TRIM(d.value) AS Director,
     SUM(CASE WHEN TRIM(g.value) = 'Horror Movies' THEN 1 ELSE 0 END) AS HorrorCount,
     SUM(CASE WHEN TRIM(g.value) = 'Comedies' THEN 1 ELSE 0 END) AS ComedyCount
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.director, ',') d
 CROSS APPLY STRING_SPLIT(nt.listed_in, ',') g
 WHERE nt.type = 'Movie'
@@ -623,7 +623,7 @@ WITH RatingCounts AS (
         type,
         rating,
         COUNT(*) AS rating_count
-    FROM netflix_titles
+    FROM NetflixContent_stagging
     GROUP BY type, rating
 ),
 RankedRatings AS (
@@ -655,9 +655,9 @@ SELECT TOP 5
     COUNT(show_id) AS total_release,
     ROUND(
         CAST(COUNT(show_id) AS numeric) /
-        CAST((SELECT COUNT(show_id) FROM netflix_titles WHERE country = 'India') AS numeric ) * 100, 2
+        CAST((SELECT COUNT(show_id) FROM NetflixContent_stagging WHERE country = 'India') AS numeric ) * 100, 2
     ) AS avg_release
-FROM netflix_titles
+FROM NetflixContent_stagging
 WHERE country = 'India'
 GROUP BY country, release_year
 ORDER BY avg_release DESC
@@ -675,9 +675,9 @@ ORDER BY avg_release DESC
 ```sql
 SELECT TOP 10 
        TRIM(country_split.value), 
-       AVG(YEAR(GETDATE()) - release_year) AS AvgMovieAge,
+       AVG(YEAR(GETDATE()) - ReleaseYear) AS AvgMovieAge,
        COUNT(*) AS MovieCount
-FROM dbo.netflix_titles nt
+FROM NetflixContent_stagging nt
 CROSS APPLY STRING_SPLIT(nt.country, ',') AS country_split
 WHERE nt.type = 'Movie'
   AND nt.country IS NOT NULL
@@ -695,10 +695,10 @@ SELECT country, AvgMovieAge, MovieCount
 FROM (
     SELECT 
         TRIM(country_split.value) AS country,
-        AVG(YEAR(GETDATE()) - release_year) AS AvgMovieAge,
+        AVG(YEAR(GETDATE()) - ReleaseYear) AS AvgMovieAge,
         COUNT(*) AS MovieCount,
         RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk
-    FROM dbo.netflix_titles nt
+    FROM NetflixContent_stagging nt
     CROSS APPLY STRING_SPLIT(nt.country, ',') AS country_split
     WHERE nt.type = 'Movie'
       AND nt.country IS NOT NULL
