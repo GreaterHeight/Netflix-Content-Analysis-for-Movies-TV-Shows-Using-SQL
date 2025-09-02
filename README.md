@@ -109,15 +109,15 @@ SET date_added = TRY_CONVERT(DATE, DateAded);
 ```sql
 
 UPDATE NetflixContent_stagging
-SET title      = LTRIM(RTRIM(Title)),
-    Director   = LTRIM(RTRIM(Director)),
-    Cast       = LTRIM(RTRIM(Cast)),
-    Country    = LTRIM(RTRIM(Country)),
-    ListedIn  = LTRIM(RTRIM(ListedIn));
+SET title      = TRIM(Title),
+    Director   = TRIM(Director),
+    Cast       = TRIM(Cast),
+    Country    = TRIM(Country),
+    ListedIn  = TRIM(ListedIn);
 
 ```
 
-### Step 4. Standardize Country Names
+### Step 4. Standardize inconsistent name , in our case - Country Names
 ```sql
 
 UPDATE NetflixContent_Stagging
