@@ -57,7 +57,7 @@ GO
 
 ```sql
 BULK INSERT NetflixContent
-FROM 'C:\...\NetflixContent.csv'		--specify the folder where you downloaded the file
+FROM 'C:\DataSource\NetflixContent.csv'		--specify the folder where you downloaded the file
 WITH (
    FORMAT = 'CSV',
 	FIELDTERMINATOR = ',',  -- Specifies the column delimiter
