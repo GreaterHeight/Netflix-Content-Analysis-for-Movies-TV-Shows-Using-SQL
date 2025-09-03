@@ -1,4 +1,4 @@
-# Netflix Movies/TV Shows End-to-End Data Analysis Project using SQL
+# Netflix Content Analysis for Movies/TV Shows - End-to-End (ETL) Data Analysis Project using SQL
 
 ![Netflix Logo](https://github.com/GreaterHeight/Netflix_ETL_SQL_Project/blob/main/NetflixLogo.png)
 
