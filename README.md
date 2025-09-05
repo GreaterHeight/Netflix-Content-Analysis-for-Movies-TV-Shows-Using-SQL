@@ -117,6 +117,37 @@ SET title      = TRIM(Title),
 
 ```
 
+
+**Create a User Defined-function (UDF) in TSQL to Remove Double Spaces within a string. This is necessary because there isn't any available to do so **
+
+```sql
+CREATE FUNCTION dbo.RemoveDoubleSpaces (@input NVARCHAR(MAX))
+RETURNS NVARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @result NVARCHAR(MAX)
+    SET @result = @input
+
+    -- Keep replacing double spaces until none left
+    WHILE CHARINDEX('  ', @result) > 0
+        SET @result = REPLACE(@result, '  ', ' ')
+
+    RETURN @result
+END
+GO
+
+```
+
+```sql
+UPDATE NetflixContent_stagging
+SET title      = dbo.RemoveDoubleSpaces(Title),
+    Director   = dbo.RemoveDoubleSpaces(Director),
+    Cast       = dbo.RemoveDoubleSpaces(Cast),
+    Country    = dbo.RemoveDoubleSpaces(Country),
+    ListedIn  = dbo.RemoveDoubleSpaces(ListedIn)
+```
+
+
 ### Step 4. Standardize inconsistent names, in our case - Country Names
 ```sql
 
@@ -129,7 +160,56 @@ SET country = CASE
 
 ```
 
+### Step 5. Convert the Initial Letter
+It may be necessary in some instanes to clean the data by capilising the initial letter of each word in strings. TSQL does not provide such function
+so we have to create a user defined function - InitCap
+
+``sql
+
+CREATE FUNCTION dbo.InitCap (@str VARCHAR(MAX))
+RETURNS VARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @result VARCHAR(MAX)
+    SET @result = ''
+    DECLARE @words TABLE (word VARCHAR(MAX))
+    INSERT INTO @words
+    SELECT value FROM STRING_SPLIT(@str, ' ')
+    
+    DECLARE @word VARCHAR(MAX)
+    DECLARE cur CURSOR FOR SELECT word FROM @words
+    OPEN cur
+    FETCH NEXT FROM cur INTO @word
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @result = @result + UPPER(LEFT(@word, 1)) + LOWER(SUBSTRING(@word, 2, LEN(@word))) + ' '
+        FETCH NEXT FROM cur INTO @word
+    END
+    CLOSE cur
+    DEALLOCATE cur
+    
+    RETURN TRIM(@result)
+END
+GO
+```
+
 ```sql
+
+UPDATE NetflixContent_Stagging
+SET  
+Title = dbo.InitCap(Title),
+Cast = dbo.InitCap(Cast),
+Director = dbo.InitCap(Cast),
+Cast = dbo.InitCap(Cast),
+ListedIn = dbo.InitCap(ListedIn)
+
+
+
+
+
+```
+
+
 
 
 --Script to count null
