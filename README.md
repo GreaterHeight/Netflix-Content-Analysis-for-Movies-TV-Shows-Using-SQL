@@ -106,6 +106,7 @@ SET date_added = TRY_CONVERT(DATE, DateAded);
 ```
 
 ### Step 3. Clean Text Fields (remove leading/trailing spaces)
+
 ```sql
 
 UPDATE NetflixContent_stagging
@@ -118,7 +119,7 @@ SET title      = TRIM(Title),
 ```
 
 
-**Create a User Defined-function (UDF) in TSQL to Remove Double Spaces within a string. This is necessary because there isn't any available to do so **
+**Create a User Defined-function (UDF) in TSQL to Remove Double Spaces within a string. This is necessary because there isn't any available to do so in TSQL**
 
 ```sql
 CREATE FUNCTION dbo.RemoveDoubleSpaces (@input NVARCHAR(MAX))
@@ -137,6 +138,8 @@ END
 GO
 
 ```
+
+**Now that the function has been created, we call RemoveDoubleSpaces on the columns with Update state as shown below**
 
 ```sql
 UPDATE NetflixContent_stagging
@@ -162,9 +165,9 @@ SET country = CASE
 
 ### Step 5. Convert the Initial Letter
 It may be necessary in some instanes to clean the data by capilising the initial letter of each word in strings. TSQL does not provide such function
-so we have to create a user defined function - InitCap
+so we have to create a User-Defined Function - InitCap
 
-``sql
+```sql
 
 CREATE FUNCTION dbo.InitCap (@str VARCHAR(MAX))
 RETURNS VARCHAR(MAX)
@@ -193,6 +196,8 @@ END
 GO
 ```
 
+**Now that the InitCap UDF has been created, we call InitCap on the columns with Update state as shown below**
+
 ```sql
 
 UPDATE NetflixContent_Stagging
@@ -203,15 +208,9 @@ Director = dbo.InitCap(Cast),
 Cast = dbo.InitCap(Cast),
 ListedIn = dbo.InitCap(ListedIn)
 
-
-
-
-
 ```
 
-
-
-
+```sql
 --Script to count null
 SELECT 
     SUM(CASE WHEN [Type] IS NULL THEN 1 ELSE 0 END) AS [Type_NullCount],
@@ -227,9 +226,7 @@ SELECT
     SUM(CASE WHEN [Description] IS NULL THEN 1 ELSE 0 END) AS [Description_NullCount]
 FROM NetflixContent_stagging
 
-``
-
-
+```
 
 
 ## Business Problems and Solutions
