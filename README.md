@@ -14,11 +14,11 @@ This project requires a thorough examination of Netflix's movie and TV show data
 
 ## Dataset
 
-Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.tech/NetflixContents.csv)
+Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.academy/NetflixContents.csv)
 
 
 ## Get dataset, Create Database & Table
-**Step 1:** Download the **dataset from:** [Netflix Dataset](https://greaterheight.tech/NetflixContent.csv)
+**Step 1:** Download the **dataset from:** [Netflix Dataset](https://greaterheight.academy/NetflixContent.csv)
 
 **Step 2:** Open the NetflixContent.csv file and explore it to determine the column names.
 
@@ -117,7 +117,7 @@ SET title      = TRIM(Title),
 
 ```
 
-### Step 4. Standardize inconsistent name , in our case - Country Names
+### Step 4. Standardize inconsistent names, in our case - Country Names
 ```sql
 
 UPDATE NetflixContent_Stagging
@@ -128,6 +128,28 @@ SET country = CASE
               END;
 
 ```
+
+```sql
+
+
+--Script to count null
+SELECT 
+    SUM(CASE WHEN [Type] IS NULL THEN 1 ELSE 0 END) AS [Type_NullCount],
+    SUM(CASE WHEN [Title] IS NULL THEN 1 ELSE 0 END) AS [Title_NullCount],
+    SUM(CASE WHEN [Director] IS NULL THEN 1 ELSE 0 END) AS [Director_NullCount],
+    SUM(CASE WHEN [Cast] IS NULL THEN 1 ELSE 0 END) AS [Cast_NullCount],
+    SUM(CASE WHEN [Country] IS NULL THEN 1 ELSE 0 END) AS [Country_NullCount],
+    SUM(CASE WHEN [DateAdded] IS NULL THEN 1 ELSE 0 END) AS [Date_added_NullCount],
+    SUM(CASE WHEN [ReleaseYear] IS NULL THEN 1 ELSE 0 END) AS [ReleaseYear_NullCount],
+    SUM(CASE WHEN [Rating] IS NULL THEN 1 ELSE 0 END) AS [Rating_NullCount],
+    SUM(CASE WHEN [Duration] IS NULL THEN 1 ELSE 0 END) AS [Duration_NullCount],
+    SUM(CASE WHEN [ListedIn] IS NULL THEN 1 ELSE 0 END) AS [ListedIn_NullCount],
+    SUM(CASE WHEN [Description] IS NULL THEN 1 ELSE 0 END) AS [Description_NullCount]
+FROM NetflixContent_stagging
+
+``
+
+
 
 
 ## Business Problems and Solutions
