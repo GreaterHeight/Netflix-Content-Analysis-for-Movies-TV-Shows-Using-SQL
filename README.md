@@ -80,6 +80,34 @@ FROM NetflixContent
 
 ## Dataset Cleaning 
 
+### Step 1. Find & Delete Duplicate Records
+
+**Option 1: Find Duplicates - Search by ShowID**
+
+```sql
+--Find Duplicates - Search by ShowID 
+SELECT 
+	ShowID, 
+	COUNT(*) duplicate_count
+FROM NetflixContent_stagging
+GROUP BY ShowID
+HAVING COUNT(*) > 1
+
+```
+**Adding Primary Key**
+
+**After seeing that there isn't any duplicates using ShowID, it's a good place to add a primary key
+Add Primary to NetflixContent_stagging**
+
+```sql
+ALTER TABLE NetflixContent_stagging
+ADD CONSTRAINT PK_Title
+PRIMARY KEY (ShowID)
+
+```
+
+
+
 ### Step 1. Handle Missing Values
 
 ```sql
@@ -101,7 +129,7 @@ ALTER COLUMN DateAded DATE;
 
 -- NOTE: If some rows cannot be converted, force conversion first
 UPDATE NetflixContent_stagging
-SET date_added = TRY_CONVERT(DATE, DateAded);
+SET DateAdded = TRY_CONVERT(DATE, DateAded);
 
 ```
 
@@ -209,6 +237,13 @@ Cast = dbo.InitCap(Cast),
 ListedIn = dbo.InitCap(ListedIn)
 
 ```
+
+
+
+## Exploratory Data Analysis 
+
+### Step 1. Handle Missing Values
+
 
 ```sql
 --Script to count null
