@@ -191,7 +191,7 @@ DELETE FROM NetflixContent_stagging_cte WHERE RowNumber > 1
 ```
 
 
-### Step 1. Handle Missing Values
+### Step 3. Handle Missing Values
 
 ```sql
 --Handle Missing Values
@@ -203,7 +203,7 @@ SET director = ISNULL(director, 'Unknown'),
     duration = ISNULL(duration, 'Unknown');
 ```
 
-### Step 2. Convert DateAded to proper DATE format
+### Step 4. Convert DateAded to proper DATE format
 
 ```sql
 -- Since DateAdded column is NVARCHAR, change it to DATE
@@ -216,7 +216,7 @@ SET DateAdded = TRY_CONVERT(DATE, DateAded);
 
 ```
 
-### Step 3. Clean Text Fields (remove leading/trailing spaces)
+### Step 5. Clean Text Fields (remove leading/trailing spaces)
 
 ```sql
 
@@ -262,7 +262,7 @@ SET title      = dbo.RemoveDoubleSpaces(Title),
 ```
 
 
-### Step 4. Standardize inconsistent names, in our case - Country Names
+### Step 6. Standardize inconsistent names, in our case - Country Names
 ```sql
 
 UPDATE NetflixContent_Stagging
@@ -274,7 +274,7 @@ SET country = CASE
 
 ```
 
-### Step 5. Convert the Initial Letter
+### Step 7. Convert the Initial Letter
 It may be necessary in some instanes to clean the data by capilising the initial letter of each word in strings. TSQL does not provide such function
 so we have to create a User-Defined Function - InitCap
 
@@ -320,6 +320,99 @@ Cast = dbo.InitCap(Cast),
 ListedIn = dbo.InitCap(ListedIn)
 
 ```
+
+### Step 8. Add Some features. Rather than querying DateAdded for operations such as YearAdded or MonthAdded we can creat these two columns ahead 
+At this point we want to 
+
+
+
+```sql
+-- Add year and month columns
+ALTER TABLE dbo.NetflixContent_stagging ADD YearAdded INT;
+ALTER TABLE dbo.NetflixContent_stagging ADD MonthAdded NVARCHAR(20);
+
+-- Populate them
+UPDATE dbo.NetflixContent_stagging
+SET YearAdded = YEAR(DateAdded),
+    MonthAdded = DATENAME(MONTH, DateAdded);
+
+-- Add cast count column
+ALTER TABLE dbo.NetflixContent_stagging ADD NoOfCast INT;
+
+UPDATE dbo.NetflixContent_stagging
+SET NoOfCast = CASE 
+                    WHEN cast = 'Unknown' THEN 0
+                    ELSE LEN(cast) - LEN(REPLACE(cast, ',', '')) + 1
+                 END;
+```
+
+
+
+### Step 9. Normalise Table
+At this point we want to 
+
+
+```sql
+
+--Create Director table from director column of NetflixContent_stagging
+SELECT 
+	ShowID, 
+	trim(value) as Director
+INTO NetflixDirector
+FROM NetflixContent_stagging
+cross apply string_split(Director,',')
+
+--Create Country table from country column of NetflixContent_stagging
+SELECT 
+	ShowID, 
+	trim(value) as Country
+INTO NetflixCountry
+FROM NetflixContent_stagging
+cross apply string_split(Country,',')
+
+
+--Create Listed_In table from country column of NetflixContent_stagging
+SELECT 
+	ShowID, 
+	trim(value) as ListedIn
+INTO NetflixListedIn
+FROM NetflixContent_stagging
+cross apply string_split(ListedIn,',')
+
+
+--Create cast table from cast column of NetflixContent_stagging
+SELECT 
+	ShowID, 
+	trim(value) as cast
+INTO NetflixCast
+FROM NetflixContent_stagging
+cross apply string_split(cast,',')
+
+
+
+--Eliminate unneeded columns – Method 1
+-- You can do this by SELECTing the needed columns into a temporary table
+SELECT  
+	ShowID, Type, Title, DateAdded, ReleaseYear, Rating, Duration, Description
+INTO 
+	netflix_titles_temp
+FROM 
+	NetflixContent_stagging 
+DROP TABLE NetflixContent_stagging_temp
+EXEC sp_rename 'NetflixContent_stagging_temp', 'NetflixContent_stagging'
+
+--Eliminate unneeded columns – Method 2
+-- You can do this by DROPping the unneeded columns from NetflixContent_stagging
+ALTER TABLE NetflixContent_stagging DROP COLUMN Director;
+ALTER TABLE NetflixContent_stagging DROP COLUMN Country;
+ALTER TABLE NetflixContent_stagging DROP COLUMN Cast;
+ALTER TABLE NetflixContent_stagging DROP COLUMN ListedIn;
+
+
+
+```
+
+
 
 
 
