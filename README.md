@@ -67,6 +67,11 @@ WITH (
 );
 Go
 ```
+**Result** 
+- Records Inserted Successfully
+
+
+
 
 **Step 5:** Execute the SQL code below. Make a backup copy of NetflixContent
 
@@ -311,18 +316,19 @@ GO
 
 ```sql
 
-UPDATE NetflixContent_Stagging
+UPDATE
+	NetflixContent_Stagging
 SET  
-Title = dbo.InitCap(Title),
-Cast = dbo.InitCap(Cast),
-Director = dbo.InitCap(Cast),
-Cast = dbo.InitCap(Cast),
-ListedIn = dbo.InitCap(ListedIn)
+	Title = dbo.InitCap(Title),
+	Cast = dbo.InitCap(Cast),
+	Director = dbo.InitCap(Cast),
+	Cast = dbo.InitCap(Cast),
+	ListedIn = dbo.InitCap(ListedIn)
 
 ```
 
-### Step 8. Add Some features. Rather than querying DateAdded for operations such as YearAdded or MonthAdded we can creat these two columns ahead 
-At this point we want to 
+### Step 8. Add some features. Rather than querying DateAdded for operations such as YearAdded or MonthAdded we can create these two columns ahead 
+
 
 
 
@@ -349,12 +355,14 @@ SET NoOfCast = CASE
 
 
 ### Step 9. Normalise Table
-At this point we want to 
 
+** **
+
+**Create: NetflixDirector Table** 
 
 ```sql
 
---Create Director table from director column of NetflixContent_stagging
+--Create Director table from Director column of NetflixContent_stagging
 SELECT 
 	ShowID, 
 	trim(value) as Director
@@ -362,6 +370,11 @@ INTO NetflixDirector
 FROM NetflixContent_stagging
 cross apply string_split(Director,',')
 
+```
+
+**--Create Country table from country column of NetflixContent_stagging** 
+
+```sql
 --Create Country table from country column of NetflixContent_stagging
 SELECT 
 	ShowID, 
@@ -370,8 +383,12 @@ INTO NetflixCountry
 FROM NetflixContent_stagging
 cross apply string_split(Country,',')
 
+```
 
---Create Listed_In table from country column of NetflixContent_stagging
+**--Create ListedIn table from ListdnIn column of NetflixContent_stagging** 
+
+```sql
+--Create ListedIn table from ListdnIn column of NetflixContent_stagging
 SELECT 
 	ShowID, 
 	trim(value) as ListedIn
@@ -379,8 +396,11 @@ INTO NetflixListedIn
 FROM NetflixContent_stagging
 cross apply string_split(ListedIn,',')
 
+```
 
---Create cast table from cast column of NetflixContent_stagging
+**--Create cast table from cast column of NetflixContent_stagging**
+
+```sql
 SELECT 
 	ShowID, 
 	trim(value) as cast
@@ -388,9 +408,10 @@ INTO NetflixCast
 FROM NetflixContent_stagging
 cross apply string_split(cast,',')
 
+```
 
 
---Eliminate unneeded columns – Method 1
+**--Eliminate unneeded columns – Method 1**
 -- You can do this by SELECTing the needed columns into a temporary table
 SELECT  
 	ShowID, Type, Title, DateAdded, ReleaseYear, Rating, Duration, Description
@@ -401,7 +422,8 @@ FROM
 DROP TABLE NetflixContent_stagging_temp
 EXEC sp_rename 'NetflixContent_stagging_temp', 'NetflixContent_stagging'
 
---Eliminate unneeded columns – Method 2
+
+**--Eliminate unneeded columns – Method 2**
 -- You can do this by DROPping the unneeded columns from NetflixContent_stagging
 ALTER TABLE NetflixContent_stagging DROP COLUMN Director;
 ALTER TABLE NetflixContent_stagging DROP COLUMN Country;
@@ -414,11 +436,27 @@ ALTER TABLE NetflixContent_stagging DROP COLUMN ListedIn;
 
 
 
-
-
 ## Exploratory Data Analysis 
 
-### Step 1. Handle Missing Values
+### Step 1. Total Counts: Titles, Movies, TV Shows
+
+```sql
+SELECT 
+    COUNT(*) AS Total_Titles,
+    SUM(CASE WHEN type = 'Movie' THEN 1 ELSE 0 END) AS Total_Movies,
+    SUM(CASE WHEN type = 'TV Show' THEN 1 ELSE 0 END) AS Total_TV_Shows
+FROM dbo.netflix_titles;
+
+```
+
+### Step 2.  Titles by Rating (Top 10)
+```sql
+
+SELECT TOP 10 rating, COUNT(*) AS CountTitles
+FROM dbo.netflix_titles
+GROUP BY rating
+ORDER BY CountTitles DESC;
+```
 
 
 ```sql
