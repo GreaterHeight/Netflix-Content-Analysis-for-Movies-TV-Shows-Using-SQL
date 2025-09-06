@@ -412,6 +412,7 @@ cross apply string_split(cast,',')
 
 
 **--Eliminate unneeded columns – Method 1**
+```sql
 -- You can do this by SELECTing the needed columns into a temporary table
 SELECT  
 	ShowID, Type, Title, DateAdded, ReleaseYear, Rating, Duration, Description
@@ -421,19 +422,16 @@ FROM
 	NetflixContent_stagging 
 DROP TABLE NetflixContent_stagging_temp
 EXEC sp_rename 'NetflixContent_stagging_temp', 'NetflixContent_stagging'
-
+``
 
 **--Eliminate unneeded columns – Method 2**
+```sql
 -- You can do this by DROPping the unneeded columns from NetflixContent_stagging
 ALTER TABLE NetflixContent_stagging DROP COLUMN Director;
 ALTER TABLE NetflixContent_stagging DROP COLUMN Country;
 ALTER TABLE NetflixContent_stagging DROP COLUMN Cast;
 ALTER TABLE NetflixContent_stagging DROP COLUMN ListedIn;
-
-
-
 ```
-
 
 
 ## Exploratory Data Analysis 
