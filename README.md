@@ -281,11 +281,11 @@ SET country = CASE
 
 ### Step 7. Convert the Initial Letter
 It may be necessary in some instanes to clean the data by capilising the initial letter of each word in strings. TSQL does not provide such function
-so we have to create a User-Defined Function - InitCap
+so we have to create a User-Defined Function - Proper()
 
 ```sql
 
-CREATE FUNCTION dbo.InitCap (@str VARCHAR(MAX))
+CREATE FUNCTION dbo.Proper (@str VARCHAR(MAX))
 RETURNS VARCHAR(MAX)
 AS
 BEGIN
@@ -312,18 +312,18 @@ END
 GO
 ```
 
-**Now that the InitCap UDF has been created, we call InitCap on the columns with Update state as shown below**
+**Now that the Proper() UDF has been created, we call Proper() on the columns with Update state as shown below**
 
 ```sql
 
 UPDATE
 	NetflixContent_Stagging
 SET  
-	Title = dbo.InitCap(Title),
-	Cast = dbo.InitCap(Cast),
-	Director = dbo.InitCap(Cast),
-	Cast = dbo.InitCap(Cast),
-	ListedIn = dbo.InitCap(ListedIn)
+	Title = dbo.Proper(Title),
+	Cast = dbo.Proper(Cast),
+	Director = dbo.Proper(Cast),
+	Cast = dbo.Proper(Cast),
+	ListedIn = dbo.Proper(ListedIn)
 
 ```
 
