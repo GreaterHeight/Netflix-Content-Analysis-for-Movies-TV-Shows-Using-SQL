@@ -80,7 +80,7 @@ FROM NetflixContent
 
 ## Dataset Cleaning 
 
-### Step 1. Find & Delete Duplicate Records
+### Step 1. Find Duplicate Records
 
 **Option 1: Find Duplicates - Search by ShowID**
 
@@ -106,6 +106,89 @@ PRIMARY KEY (ShowID)
 
 ```
 
+**Option 2: Find Duplicates - Search by Title**
+
+```sql
+--Find Duplicates - Search by title 
+SELECT 
+	* 
+FROM NetflixContent_stagging 
+WHERE Title in 
+(
+	SELECT Title
+	FROM NetflixContent_stagging 
+	GROUP BY title
+	HAVING COUNT(*) > 1
+)
+ORDER BY Title
+
+```
+
+**Option 3: Find Duplicates - Search by title, type**
+
+```sql
+
+--Find Duplicates - Search by title, type
+SELECT 
+* 
+FROM NetflixContent_stagging 
+WHERE Title in 
+(
+	SELECT Title
+	FROM NetflixContent_stagging 
+	GROUP BY title, type
+	HAVING COUNT(*) > 1
+)
+ORDER BY Title
+```
+**Option 4: Find Duplicates - Search by title, type - USING another method**
+
+```sql
+--Find duplicate records based on CONCATENATED title, type
+SELECT 
+* 
+FROM NetflixContent_stagging 
+WHERE CONCAT(Title, Type) in 
+(
+	SELECT CONCAT(Title, Type)
+	FROM NetflixContent_stagging 
+	GROUP BY CONCAT(Title, Type)
+	HAVING COUNT(*) > 1
+)
+ORDER BY Title
+
+```
+
+**Option 3 is our best option - in finding duplicates**
+
+
+
+### Step 2. Removing/Delete Duplicate Records
+
+**Option 1: --Remove Duplicates This method will ONLY work when ID is primary**
+
+```sql
+DELETE FROM NetflixContent_stagging WHERE ID NOT IN
+(
+	SELECT MIN(ID) FROM NetflixContent_stagging
+	GROUP BY Title, Type
+)
+
+```
+**Option 2: --Remove Duplicates**
+```sql
+--Remove Duplicates 
+WITH NetflixContent_stagging_cte AS 
+(
+	SELECT 
+		*, 
+		ROW_NUMBER() OVER (PARTITION BY Title, type ORDER BY ShowID) AS RowNumber 
+	FROM 
+		NetflixContent_stagging
+)
+DELETE FROM NetflixContent_stagging_cte WHERE RowNumber > 1
+
+```
 
 
 ### Step 1. Handle Missing Values
