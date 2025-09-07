@@ -62,6 +62,7 @@ WITH (
    FORMAT = 'CSV',
 	FIELDTERMINATOR = ',',  -- Specifies the column delimiter
     ROWTERMINATOR = '\n',   -- Specifies the row terminator (newline character)
+	--FIELDQUOTE = '"',       -- handle quoted fields (Note: this line is necessary if the column has quotes
     FIRSTROW = 2,            -- Optional: Skips the header row if present
 	TABLOCK
 );
@@ -208,6 +209,18 @@ SET director = ISNULL(director, 'Unknown'),
     duration = ISNULL(duration, 'Unknown');
 ```
 
+### Step 3. Swapping Duration values with rating for some ShowID 
+We observed that these records place duration values under rating select * from netflix_titles_filter where duration is null or duration = 'Unknown'
+```sql
+UPDATE T1
+SET 
+	T1.duration = T2.Rating
+FROM NetflixContent_stagging T1
+JOIN NetflixContent_stagging T2
+ON T1.ShowID = T2.ShowID
+WHERE T1.duration is null OR T1.duration = 'Unknown'
+
+```
 ### Step 4. Convert DateAded to proper DATE format
 
 ```sql
