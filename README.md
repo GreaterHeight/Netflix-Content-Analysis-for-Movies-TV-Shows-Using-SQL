@@ -67,6 +67,12 @@ WITH (
 	TABLOCK
 );
 Go
+-- Success Message
+SELECT 'Data Import successful' as Success_Message;
+
+
+
+
 ```
 **Result** 
 - Records Inserted Successfully
