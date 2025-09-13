@@ -14,11 +14,11 @@ This project requires a thorough examination of Netflix's movie and TV show data
 
 ## Dataset
 
-Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://greaterheight.academy/NetflixContents.csv)
+Though the dataset for this project is sourced from the Kaggle dataset but **it's uploaded here:** [Netflix Dataset](https://www.greaterheight.academy/Portals/0/NetflixContent.rar)
 
 
 ## Get dataset, Create Database & Table
-**Step 1:** Download the **dataset from:** [Netflix Dataset](https://greaterheight.academy/NetflixContent.csv)
+**Step 1:** Download the **dataset from:** [Netflix Dataset](https://www.greaterheight.academy/Portals/0/NetflixContent.rar)
 
 **Step 2:** Open the NetflixContent.csv file and explore it to determine the column names.
 
